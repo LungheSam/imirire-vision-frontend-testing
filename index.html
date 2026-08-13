@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Imirire Myiza — Meal Scan Test</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green-900: #04342C;
+    --green-800: #085041;
+    --green-600: #0F6E56;
+    --green-400: #1D9E75;
+    --green-200: #9FE1CB;
+    --green-50: #E1F5EE;
+    --white: #FFFFFF;
+    --text-primary: #1A1A18;
+    --text-secondary: #5F5E5A;
+    --border: #D3D1C7;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: "Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: #E9F3EE;
+    color: var(--text-primary);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+  }
+
+  .app-shell {
+    width: min(420px, 100%);
+    background: var(--white);
+    border-radius: 26px;
+    overflow: hidden;
+    box-shadow: 0 22px 60px rgba(4, 52, 44, 0.12);
+  }
+
+  header {
+    background: var(--green-800);
+    color: var(--white);
+    padding: 22px 24px 20px;
+    text-align: center;
+    position: relative;
+  }
+
+  header h1 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+  }
+
+  header p {
+    margin: 4px 0 0;
+    font-size: 13px;
+    color: var(--green-200);
+  }
+
+  .lang-toggle {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    display: flex;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 20px;
+    overflow: hidden;
+  }
+
+  .lang-toggle button {
+    border: none;
+    background: transparent;
+    color: var(--green-200);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 5px 10px;
+    cursor: pointer;
+    font-family: inherit;
+  }
+
+  .lang-toggle button.active {
+    background: var(--white);
+    color: var(--green-800);
+  }
+
+  main {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 24px 20px 44px;
+  }
+
+  .upload-card {
+    border: 1.5px dashed var(--green-400);
+    border-radius: 12px;
+    background: var(--green-50);
+    padding: 28px 20px;
+    text-align: center;
+  }
+
+  .upload-card p {
+    margin: 0 0 16px;
+    color: var(--text-secondary);
+    font-size: 14px;
+  }
+
+  .btn-row {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    background: var(--green-600);
+    color: var(--white);
+    font-family: inherit;
+  }
+
+  .btn.secondary {
+    background: var(--white);
+    color: var(--green-600);
+    border: 1.5px solid var(--green-600);
+  }
+
+  input[type="file"] { display: none; }
+
+  #status {
+    margin-top: 14px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    min-height: 18px;
+  }
+
+  #results { margin-top: 28px; display: none; }
+
+  #boxed-image {
+    width: 100%;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    display: block;
+  }
+
+  .total-kcal {
+    margin-top: 14px;
+    background: var(--green-50);
+    border-radius: 10px;
+    padding: 14px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+
+  .total-kcal .label {
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+
+  .total-kcal .value {
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--green-800);
+  }
+
+  .macro-grid {
+    margin-top: 10px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+
+  .macro-pill {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 6px;
+    text-align: center;
+  }
+
+  .macro-pill .macro-value {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--green-800);
+    display: block;
+  }
+
+  .macro-pill .macro-label {
+    font-size: 10px;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+
+  .food-list {
+    margin-top: 16px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .food-row {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+  }
+
+  .food-row:last-child { border-bottom: none; }
+
+  .food-row-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+  }
+
+  .food-row .name { font-weight: 500; }
+  .food-row .count-badge {
+    font-size: 10px;
+    background: var(--green-50);
+    color: var(--green-600);
+    padding: 1px 6px;
+    border-radius: 10px;
+    margin-left: 6px;
+    font-weight: 600;
+  }
+  .food-row .kcal { color: var(--green-600); font-weight: 500; }
+
+  .food-row-detail {
+    display: none;
+    margin-top: 10px;
+    grid-template-columns: repeat(3, 1fr);
+    display: none;
+    gap: 6px;
+  }
+
+  .food-row.expanded .food-row-detail {
+    display: grid;
+  }
+
+  .food-row-detail .detail-item {
+    font-size: 11px;
+    color: var(--text-secondary);
+    background: var(--green-50);
+    border-radius: 6px;
+    padding: 5px 4px;
+    text-align: center;
+  }
+
+  .food-row-detail .detail-item strong {
+    display: block;
+    color: var(--text-primary);
+    font-size: 12px;
+  }
+
+  .advice-box {
+    margin-top: 18px;
+    background: var(--white);
+    border-left: 3px solid var(--green-400);
+    padding: 14px 16px;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--text-primary);
+    min-height: 24px;
+  }
+
+  .advice-box .eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--green-600);
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+
+  #advice-text::after {
+    content: "";
+  }
+
+  #advice-text.typing::after {
+    content: "|";
+    color: var(--green-400);
+    animation: blink 0.8s step-start infinite;
+  }
+
+  @keyframes blink {
+    50% { opacity: 0; }
+  }
+</style>
+</head>
+<body>
+<div class="app-shell">
+<header>
+  <h1 id="app-title">Imirire Myiza</h1>
+  <p id="app-subtitle">Meal scan test — upload or capture a photo</p>
+  <div class="lang-toggle">
+    <button id="lang-en" class="active" data-lang="en">EN</button>
+    <button id="lang-rw" data-lang="rw">RW</button>
+  </div>
+</header>
+
+<main>
+  <div class="upload-card">
+    <p id="upload-prompt">Take a photo of your plate, or upload one from your device.</p>
+    <div class="btn-row">
+      <button class="btn" id="camera-btn">Scan with camera</button>
+      <button class="btn secondary" id="upload-btn">Upload photo</button>
+    </div>
+    <input type="file" id="camera-input" accept="image/*" capture="environment" />
+    <input type="file" id="upload-input" accept="image/*" />
+    <div id="status"></div>
+  </div>
+
+  <div id="results">
+    <img id="boxed-image" alt="Meal with detected food items boxed" />
+
+    <div class="total-kcal">
+      <span class="label" id="total-kcal-label">Total estimated calories</span>
+      <span class="value" id="total-kcal-value">0 kcal</span>
+    </div>
+
+    <div class="macro-grid" id="macro-grid"></div>
+
+    <div class="food-list" id="food-list"></div>
+
+    <div class="advice-box">
+      <div class="eyebrow" id="advice-label">Advice</div>
+      <div id="advice-text"></div>
+    </div>
+  </div>
+</main>
+</div>
+
+<script>
+  // Point this at wherever the FastAPI backend is running.
+  const API_BASE_URL = "http://localhost:8000/predict";
+
+  const TRANSLATIONS = {
+    en: {
+      subtitle: "Meal scan test — upload or capture a photo",
+      uploadPrompt: "Take a photo of your plate, or upload one from your device.",
+      cameraBtn: "Scan with camera",
+      uploadBtn: "Upload photo",
+      scanning: "Scanning meal...",
+      error: "Could not reach the scan service. Is the backend running?",
+      totalKcalLabel: "Total estimated calories",
+      adviceLabel: "Advice",
+      noItems: "No known items detected",
+      macros: { protein_g: "Protein", carbs_g: "Carbs", fat_g: "Fat", fiber_g: "Fiber", sugar_g: "Sugar", sodium_mg: "Sodium" },
+      detailLabels: { protein_g: "Protein", carbs_g: "Carbs", fat_g: "Fat", fiber_g: "Fiber", sugar_g: "Sugar", sodium_mg: "Sodium", glycemic_index: "Glycemic index" },
+    },
+    rw: {
+      subtitle: "Isuzuma ry'ifunguro — ohereza cyangwa ufate ifoto",
+      uploadPrompt: "Fata ifoto y'ifunguro ryawe, cyangwa wohereze imwe uyifite kuri telefoni.",
+      cameraBtn: "Fata ifoto n'ikamera",
+      uploadBtn: "Ohereza ifoto",
+      scanning: "Turimo gusuzuma ifunguro...",
+      error: "Ntibishoboka kugera kuri sisitemu. Reba niba seriveri ikora.",
+      totalKcalLabel: "Kalori zose zigereranyijwe",
+      adviceLabel: "Inama",
+      noItems: "Nta biryo byamenyekanye",
+      macros: { protein_g: "Poroteyine", carbs_g: "Ibinyabutabire", fat_g: "Amavuta", fiber_g: "Fibre", sugar_g: "Isukari", sodium_mg: "Umunyu" },
+      detailLabels: { protein_g: "Poroteyine", carbs_g: "Ibinyabutabire", fat_g: "Amavuta", fiber_g: "Fibre", sugar_g: "Isukari", sodium_mg: "Umunyu", glycemic_index: "Igipimo cy'isukari (GI)" },
+    },
+  };
+
+  let currentLang = "en";
+  let lastFile = null;
+  let typingTimer = null;
+
+  const els = {
+    title: document.getElementById("app-title"),
+    subtitle: document.getElementById("app-subtitle"),
+    uploadPrompt: document.getElementById("upload-prompt"),
+    cameraBtn: document.getElementById("camera-btn"),
+    uploadBtn: document.getElementById("upload-btn"),
+    cameraInput: document.getElementById("camera-input"),
+    uploadInput: document.getElementById("upload-input"),
+    status: document.getElementById("status"),
+    results: document.getElementById("results"),
+    boxedImage: document.getElementById("boxed-image"),
+    totalKcalLabel: document.getElementById("total-kcal-label"),
+    totalKcalValue: document.getElementById("total-kcal-value"),
+    macroGrid: document.getElementById("macro-grid"),
+    foodList: document.getElementById("food-list"),
+    adviceLabel: document.getElementById("advice-label"),
+    adviceText: document.getElementById("advice-text"),
+    langEn: document.getElementById("lang-en"),
+    langRw: document.getElementById("lang-rw"),
+  };
+
+  function applyStaticTranslations() {
+    const t = TRANSLATIONS[currentLang];
+    els.subtitle.textContent = t.subtitle;
+    els.uploadPrompt.textContent = t.uploadPrompt;
+    els.cameraBtn.textContent = t.cameraBtn;
+    els.uploadBtn.textContent = t.uploadBtn;
+    els.totalKcalLabel.textContent = t.totalKcalLabel;
+    els.adviceLabel.textContent = t.adviceLabel;
+  }
+
+  function setLang(lang) {
+    currentLang = lang;
+    els.langEn.classList.toggle("active", lang === "en");
+    els.langRw.classList.toggle("active", lang === "rw");
+    applyStaticTranslations();
+
+    // Re-run the scan in the new language if we already have a photo,
+    // so the advice text (and any language-dependent labels) update too.
+    if (lastFile) {
+      handleFile(lastFile, { skipStore: true });
+    }
+  }
+
+  els.langEn.addEventListener("click", () => setLang("en"));
+  els.langRw.addEventListener("click", () => setLang("rw"));
+
+  els.cameraBtn.addEventListener("click", () => els.cameraInput.click());
+  els.uploadBtn.addEventListener("click", () => els.uploadInput.click());
+
+  els.cameraInput.addEventListener("change", (e) => handleFile(e.target.files[0]));
+  els.uploadInput.addEventListener("change", (e) => handleFile(e.target.files[0]));
+
+  async function handleFile(file, opts = {}) {
+    if (!file) return;
+    if (!opts.skipStore) lastFile = file;
+
+    const t = TRANSLATIONS[currentLang];
+    els.status.textContent = t.scanning;
+    els.results.style.display = "none";
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const url = `${API_BASE_URL}?lang=${currentLang}&use_llm=true`;
+
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error(`Server responded with ${response.status}`);
+      }
+
+      const data = await response.json();
+      renderResults(data);
+      els.status.textContent = "";
+    } catch (err) {
+      els.status.textContent = t.error;
+      console.error(err);
+    }
+  }
+
+  function renderResults(data) {
+    const t = TRANSLATIONS[currentLang];
+
+    els.boxedImage.src = data.image_base64;
+    els.totalKcalValue.textContent = `${data.totals.kcal} kcal`;
+
+    // Macro summary pills
+    els.macroGrid.innerHTML = "";
+    const macroKeys = ["protein_g", "carbs_g", "fat_g", "fiber_g", "sugar_g", "sodium_mg"];
+    macroKeys.forEach((key) => {
+      const unit = key === "sodium_mg" ? "mg" : "g";
+      const pill = document.createElement("div");
+      pill.className = "macro-pill";
+      pill.innerHTML = `
+        <span class="macro-value">${data.totals[key]}${unit}</span>
+        <span class="macro-label">${t.macros[key]}</span>
+      `;
+      els.macroGrid.appendChild(pill);
+    });
+
+    // Food list, expandable per item for full macro + GI detail
+    els.foodList.innerHTML = "";
+    if (data.nutrition.length === 0) {
+      els.foodList.innerHTML = `<div class="food-row"><div class="food-row-top"><span class="name">${t.noItems}</span></div></div>`;
+    } else {
+      data.nutrition.forEach((item) => {
+        const row = document.createElement("div");
+        row.className = "food-row";
+
+        const countBadge = item.detection_count > 1
+          ? `<span class="count-badge">×${item.detection_count}</span>`
+          : "";
+
+        row.innerHTML = `
+          <div class="food-row-top">
+            <span class="name">${item.food_name_en}${countBadge}</span>
+            <span class="kcal">${item.kcal} kcal</span>
+          </div>
+          <div class="food-row-detail">
+            <div class="detail-item"><strong>${item.protein_g}g</strong>${t.detailLabels.protein_g}</div>
+            <div class="detail-item"><strong>${item.carbs_g}g</strong>${t.detailLabels.carbs_g}</div>
+            <div class="detail-item"><strong>${item.fat_g}g</strong>${t.detailLabels.fat_g}</div>
+            <div class="detail-item"><strong>${item.fiber_g}g</strong>${t.detailLabels.fiber_g}</div>
+            <div class="detail-item"><strong>${item.sugar_g}g</strong>${t.detailLabels.sugar_g}</div>
+            <div class="detail-item"><strong>${item.glycemic_index}</strong>${t.detailLabels.glycemic_index}</div>
+          </div>
+        `;
+
+        row.addEventListener("click", () => row.classList.toggle("expanded"));
+        els.foodList.appendChild(row);
+      });
+    }
+
+    typeAdviceText(data.advice);
+    els.results.style.display = "block";
+  }
+
+  function typeAdviceText(fullText) {
+    if (typingTimer) clearInterval(typingTimer);
+
+    els.adviceText.textContent = "";
+    els.adviceText.classList.add("typing");
+
+    let i = 0;
+    const speedMs = 18;
+
+    typingTimer = setInterval(() => {
+      i++;
+      els.adviceText.textContent = fullText.slice(0, i);
+      if (i >= fullText.length) {
+        clearInterval(typingTimer);
+        els.adviceText.classList.remove("typing");
+      }
+    }, speedMs);
+  }
+
+  applyStaticTranslations();
+</script>
+
+</body>
+</html>
